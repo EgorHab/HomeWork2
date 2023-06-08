@@ -1,18 +1,24 @@
 package Lesson5;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.interactions.Actions;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class TestCases {
+
+    public String password = "271486Geekbrains";
+    public String userName = "frl27";
+    public String newPassword = "271486Geekbrains@";
+    public String sendAddress = "egoregor27";
+
 
     private WebDriver driver;
     //private Alert alert;
@@ -21,7 +27,7 @@ public class TestCases {
     @AfterEach
     public void cleanUp() {
         if (driver != null) {
-            driver.quit();
+            //driver.quit();
         }
 
     }
@@ -29,7 +35,8 @@ public class TestCases {
 
     @Test
     void testCase1() {
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
+        WebDriverManager.chromedriver().setup();
+
 
         driver = new ChromeDriver();
 
@@ -37,32 +44,30 @@ public class TestCases {
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
 
+        LiveJournalPage liveJournalPage = new LiveJournalPage(driver);
 
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
         options.addArguments("--incognito");
+        //options.addArguments("--headless");
 
         driver.get("https://www.livejournal.com");
 
 
-        driver.findElement(By.xpath(".//ul[@class ='s-do'] //a")).click();
-        driver.findElement(By.id("user")).click();
-        driver.findElement(By.id("user")).sendKeys("frl27");
-        driver.findElement(By.id("lj_loginwidget_password")).click();
-        driver.findElement(By.id("lj_loginwidget_password")).sendKeys("271486Geekbrains");
-        driver.findElement(By.name("action:login")).click();
+        liveJournalPage.clickLogIn();
+        liveJournalPage.writeUserArea(userName);
+        liveJournalPage.writePasswordArea(password);
+        liveJournalPage.clickSubmitAuthorization();
 
 
-        driver.findElement(By.xpath(".//div[@class='s-header__nav']//a[@data-tour = 'friendsfeed']")).click();
+        liveJournalPage.clickFriends();
 
-        WebElement Element = driver.findElement(By.xpath(".//div[@class = 'main-footer__lang']//p"));
-        js.executeScript("arguments[0].scrollIntoView();", Element);
 
-        driver.findElement(By.xpath(".//div[@class = 'main-footer__lang']//p")).click();
-        js.executeScript("arguments[0].scrollIntoView();", Element);
-        driver.findElement(By.cssSelector(".s-lang-select li:nth-child(1)")).click();
+        js.executeScript("arguments[0].scrollIntoView();", liveJournalPage.listOfLanguages);
+        liveJournalPage.clickListLang();
+        js.executeScript("arguments[0].scrollIntoView();", liveJournalPage.listOfLanguages);
+        liveJournalPage.clickEnglishLanguage();
 
         Assertions.assertEquals("Entries feed for frl27", driver.getTitle());
 
@@ -71,14 +76,13 @@ public class TestCases {
 
     @Test
     void testCase2() {
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         ChromeOptions options = new ChromeOptions();
-        Actions builder = new Actions(driver);
-        //JavascriptExecutor js = (JavascriptExecutor) driver;
+        LiveJournalPage liveJournalPage = new LiveJournalPage(driver);
+        SettingPage settingPage = new SettingPage(driver);
 
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
@@ -87,51 +91,45 @@ public class TestCases {
         driver.get("https://www.livejournal.com");
 
         /*Предусловие: пользователь авторизован*/
-        driver.findElement(By.xpath(".//ul[@class ='s-do'] //a")).click();
-        driver.findElement(By.id("user")).click();
-        driver.findElement(By.id("user")).sendKeys("frl27");
-        driver.findElement(By.id("lj_loginwidget_password")).click();
-        driver.findElement(By.id("lj_loginwidget_password")).sendKeys("271486Geekbrains");
-        driver.findElement(By.name("action:login")).click();
+
+        liveJournalPage.clickLogIn();
+        liveJournalPage.writeUserArea(userName);
+        liveJournalPage.writePasswordArea(password);
+        liveJournalPage.clickSubmitAuthorization();
 
 
 
         /*Шаги*/
 
 
-        builder.moveToElement(driver.findElement(By.cssSelector(".s-header-item--user"))).perform();
-        driver.findElement(By.cssSelector(".s-header-sub-list-item__link--settings")).click();
-        driver.findElement(By.xpath(".//div[@data-react-root]/div/nav/a[2]")).click();
-        driver.findElement(By.cssSelector("tr:nth-child(5) > .account_actionlink > a")).click();
-        driver.findElement(By.name("password")).click();
-        driver.findElement(By.name("password")).sendKeys("271486Geekbrains");
-        driver.findElement(By.name("newpass1")).click();
-        driver.findElement(By.name("newpass1")).sendKeys("271486Geekbrains@");
-        driver.findElement(By.name("newpass2")).click();
-        driver.findElement(By.name("newpass2")).sendKeys("271486Geekbrains@");
-        driver.findElement(By.cssSelector(".b-ljform-field > .b-flatbutton")).click();
+        liveJournalPage.callDropDownList();
+        liveJournalPage.clickSettingDropDown();
+        settingPage.clickAccountSet();
+        settingPage.clickPasswordSet();
+        settingPage.writePassword(password);
+
+        settingPage.writeNewPassword(newPassword);
+        settingPage.writeNewPassword2(newPassword);
+
+
+        settingPage.saveNewPass();
 
 
         /*Вернуть систему в исходное состояние*/
 
-        driver.findElement(By.xpath(".//ul[@class ='s-do'] //a")).click();
-        driver.findElement(By.id("user")).click();
-        driver.findElement(By.id("user")).sendKeys("frl27");
-        driver.findElement(By.id("lj_loginwidget_password")).click();
-        driver.findElement(By.id("lj_loginwidget_password")).sendKeys("271486Geekbrains@");
-        driver.findElement(By.name("action:login")).click();
-        driver.findElement(By.xpath(".//div[@class='s-header__nav']//a[@data-tour = 'friendsfeed']")).click();
-        builder.moveToElement(driver.findElement(By.cssSelector(".s-header-item--user"))).perform();
-        driver.findElement(By.cssSelector(".s-header-sub-list-item__link--settings")).click();
-        driver.findElement(By.xpath(".//div[@data-react-root]/div/nav/a[2]")).click();
-        driver.findElement(By.cssSelector("tr:nth-child(5) > .account_actionlink > a")).click();
-        driver.findElement(By.name("password")).click();
-        driver.findElement(By.name("password")).sendKeys("271486Geekbrains@");
-        driver.findElement(By.name("newpass1")).click();
-        driver.findElement(By.name("newpass1")).sendKeys("271486Geekbrains");
-        driver.findElement(By.name("newpass2")).click();
-        driver.findElement(By.name("newpass2")).sendKeys("271486Geekbrains");
-        driver.findElement(By.cssSelector(".b-ljform-field > .b-flatbutton")).click();
+        liveJournalPage.clickLogIn();
+        liveJournalPage.writeUserArea(userName);
+        liveJournalPage.writePasswordArea(newPassword);
+        liveJournalPage.clickSubmitAuthorization();
+        liveJournalPage.callDropDownList();
+        liveJournalPage.clickSettingDropDown();
+        settingPage.clickAccountSet();
+        settingPage.clickPasswordSet();
+        settingPage.writePassword(newPassword);
+        settingPage.writeNewPassword(password);
+        settingPage.writeNewPassword2(password);
+        settingPage.saveNewPass();
+
 
         Assertions.assertEquals("Change Password", driver.getTitle());
 
@@ -140,14 +138,13 @@ public class TestCases {
 
     @Test
     void testCase3() {
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         ChromeOptions options = new ChromeOptions();
-        Actions builder = new Actions(driver);
+        LiveJournalPage liveJournalPage = new LiveJournalPage(driver);
+        MessagePage messagePage = new MessagePage(driver);
 
-
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
@@ -159,24 +156,24 @@ public class TestCases {
 
 
         /*Предусловие: пользователь авторизован*/
-        driver.findElement(By.xpath(".//ul[@class ='s-do'] //a")).click();
-        driver.findElement(By.id("user")).click();
-        driver.findElement(By.id("user")).sendKeys("frl27");
-        driver.findElement(By.id("lj_loginwidget_password")).click();
-        driver.findElement(By.id("lj_loginwidget_password")).sendKeys("271486Geekbrains");
-        driver.findElement(By.name("action:login")).click();
+
+        liveJournalPage.clickLogIn();
+        liveJournalPage.writeUserArea(userName);
+        liveJournalPage.writePasswordArea(password);
+        liveJournalPage.clickSubmitAuthorization();
+
 
         /*Шаги*/
 
-        builder.moveToElement(driver.findElement(By.cssSelector(".s-header-item--user"))).perform();
-        driver.findElement(By.cssSelector(".s-header-sub-list-item__link--messages")).click();
-        driver.findElement(By.cssSelector(".inbox-sidebar__button-message")).click();
-        driver.findElement(By.id("msg_to")).click();
-        driver.findElement(By.id("msg_to")).sendKeys("egoregor27");
-        driver.findElement(By.name("msg_subject")).click();
-        driver.findElement(By.name("msg_subject")).sendKeys("test");
-        driver.findElement(By.name("msg_body")).sendKeys("test");
-        driver.findElement(By.cssSelector("button:nth-child(4)")).click();
+        liveJournalPage.callDropDownList();
+        liveJournalPage.clickMessageDropDown();
+
+        messagePage.clickMessageNew();
+        messagePage.sendToArea(sendAddress);
+        messagePage.titleArea("test");
+        messagePage.bodyArea("test");
+
+        messagePage.clickSendButton();
 
         Assertions.assertEquals("Compose Message", driver.getTitle());
 
@@ -185,14 +182,14 @@ public class TestCases {
 
     @Test
     void testCase4() {
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         ChromeOptions options = new ChromeOptions();
-        //Actions builder = new Actions(driver);
-        JavascriptExecutor js = (JavascriptExecutor) driver;
 
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        LiveJournalPage liveJournalPage = new LiveJournalPage(driver);
+
 
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
@@ -200,41 +197,40 @@ public class TestCases {
 
         driver.get("https://www.livejournal.com");
 
-        WebElement Element = driver.findElement(By.linkText("Пользовательское соглашение"));
+
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        js.executeScript("arguments[0].scrollIntoView();", Element);
-        driver.findElement(By.linkText("Пользовательское соглашение"));
+        js.executeScript("arguments[0].scrollIntoView();", liveJournalPage.userAgreement);
+
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        js.executeScript("arguments[0].scrollIntoView();", Element);
-        driver.findElement(By.linkText("Пользовательское соглашение"));
+        js.executeScript("arguments[0].scrollIntoView();", liveJournalPage.userAgreement);
+
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        js.executeScript("arguments[0].scrollIntoView();", Element);
-        driver.findElement(By.linkText("Пользовательское соглашение"));
+        js.executeScript("arguments[0].scrollIntoView();", liveJournalPage.userAgreement);
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        js.executeScript("arguments[0].scrollIntoView();", Element);
+        js.executeScript("arguments[0].scrollIntoView();", liveJournalPage.userAgreement);
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        driver.findElement(By.linkText("Пользовательское соглашение"));
+
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        js.executeScript("arguments[0].scrollIntoView();", Element);
+        js.executeScript("arguments[0].scrollIntoView();", liveJournalPage.userAgreement);
 
         /*Пришлось городить такие костыли, т.к страница при вертикальном скролле добавляет длину
         всякий раз когда пролистываешь до самого низа. Сам элемент недоступен для взаимодействия пока вне поля зрения.*/
 
 
-        driver.findElement(By.linkText("Пользовательское соглашение")).click();
+        liveJournalPage.clickUserAgreement();
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        driver.findElement(By.cssSelector(".main-footer__bottom-links-item:nth-child(3) > .main-footer__bottom-link")).click();
+        liveJournalPage.clickHelp();
         js.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-        driver.findElement(By.linkText("Политика конфиденциальности")).click();
+        liveJournalPage.clickPrivacyPolicy();
 
         Assertions.assertEquals("Правовая информация", driver.getTitle());
 
@@ -242,17 +238,15 @@ public class TestCases {
 
     @Test
     void testCase5() {
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver();
         driver.manage().window().setSize(new Dimension(1920, 1080));
         ChromeOptions options = new ChromeOptions();
-        //Actions builder = new Actions(driver);
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        //WebDriverWait wait = new WebDriverWait(driver, 4);
+        LiveJournalPage liveJournalPage = new LiveJournalPage(driver);
+        EditGroupFriends editGroupFriends = new EditGroupFriends(driver);
+        //JavascriptExecutor js = (JavascriptExecutor) driver;
 
-
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
@@ -263,18 +257,16 @@ public class TestCases {
 
         /*Предусловие: пользователь авторизован*/
 
-        driver.findElement(By.xpath(".//ul[@class ='s-do'] //a")).click();
-        driver.findElement(By.id("user")).click();
-        driver.findElement(By.id("user")).sendKeys("frl27");
-        driver.findElement(By.id("lj_loginwidget_password")).click();
-        driver.findElement(By.id("lj_loginwidget_password")).sendKeys("271486Geekbrains");
-        driver.findElement(By.name("action:login")).click();
+        liveJournalPage.clickLogIn();
+        liveJournalPage.writeUserArea(userName);
+        liveJournalPage.writePasswordArea(password);
+        liveJournalPage.clickSubmitAuthorization();
 
 
         /*Шаги*/
 
-        driver.findElement(By.xpath(".//div[@class='s-header__nav']//a[@data-tour = 'friendsfeed']")).click();
-        driver.findElement(By.xpath(".//ul[@class='aside-menu']//a[@target='_blank']")).click();
+        liveJournalPage.clickFriends();
+        liveJournalPage.clickFilterSet();
 
 
         List<String> allHandles = new ArrayList(driver.getWindowHandles());
@@ -282,25 +274,25 @@ public class TestCases {
 
         driver.switchTo().window(currentHandle);
 
-        driver.findElement(By.xpath(".//select[@name='list_groups']/option[@value='1']")).click();
+        editGroupFriends.clickFamily();
 
         for (int j = 0; j < 5; j++) {
-            driver.findElement(By.xpath(".//input[@value='Подвинуть вниз']")).click(); /*Сместить элемент вниз на 5 позиций*/
+            editGroupFriends.moveDown();
         }
 
-        driver.findElement(By.xpath(".//button[@value='Сохранить изменения']")).click();
+        editGroupFriends.clickSaveChanges();
 
 
         /*Вернуть систему в исходное состояние*/
 
         driver.navigate().back();
-        driver.findElement(By.xpath(".//select[@name='list_groups']/option[@value='1']")).click();
+        editGroupFriends.clickFamily();
 
         for (int x = 0; x < 5; x++) {
-            driver.findElement(By.xpath(".//input[@value='Подвинуть вверх']")).click();
+            editGroupFriends.moveUp();
         }
 
-        driver.findElement(By.xpath(".//button[@value='Сохранить изменения']")).click();
+        editGroupFriends.clickSaveChanges();
 
 
     }
