@@ -15,13 +15,13 @@ import java.util.concurrent.TimeUnit;
 
 public class ByTicket {
     String contractAddress = "0x699427Bfe45E245cc2e81EbeDe21d535992Cc40C";
-    String amount = "0.0001";
-    String data = "0x67dd74ca0000000000000000000000000000000000000000000000000000000000000001";
+    String amount = "0.00012";
+    String data = "0x67dd74ca0000000000000000000000000000000000000000000000000000000000000017";
     String gas = "1000000";
      String privateKeys = "C:\\key.txt";
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         WebDriver driver = new ChromeDriver(options);
@@ -88,7 +88,7 @@ public class ByTicket {
 
         driver.findElement(By.xpath(".//textarea[@id='aria6']")).clear();
 
-        for (int i = 1; i < 10; i++) {
+        for (int i = 181; i <= 1000; i++) {
 
             driver.findElement(By.xpath(".//textarea[@id='aria6']")).sendKeys(key.get(i));
             driver.findElement(By.xpath(".//a[@class='btn btn-primary ng-scope']")).click();
@@ -97,6 +97,7 @@ public class ByTicket {
 
             //driver.findElement(By.xpath(".//input[@ng-model='tx.gasLimit']")).clear();
             //driver.findElement(By.xpath(".//input[@ng-model='tx.gasLimit']")).sendKeys(byTicket.gas);
+            Thread.sleep(2000);
             driver.findElement(By.xpath(".//p[@translate = 'TRANS_advanced']")).click();
 
             //driver.findElement(By.xpath(".//input[@ng-model= 'tx.data']")).sendKeys(byTicket.data);
@@ -108,6 +109,8 @@ public class ByTicket {
             driver.findElement(By.xpath(".//span[@ng-show='wd'] ")).click();
 
             driver.findElement(By.xpath(".//textarea[@id='aria6']")).clear();
+
+            System.out.println(key.get(i));
 
 
         }

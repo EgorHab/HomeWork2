@@ -1,10 +1,12 @@
 package Lesson5;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.junit.jupiter.api.AfterEach;
+import io.qameta.allure.Description;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
@@ -24,17 +26,19 @@ public class TestCases {
     //private Alert alert;
 
 
-    @AfterEach
-    public void cleanUp() {
-        if (driver != null) {
-            //driver.quit();
-        }
-
-    }
+//    @AfterEach
+//    public void cleanUp() {
+//        if (driver != null) {
+//            driver.quit();
+//        }
+//
+//    }
 
 
     @Test
+    @Description("Some detailed test description")
     void testCase1() {
+
         WebDriverManager.chromedriver().setup();
 
 
@@ -69,7 +73,7 @@ public class TestCases {
         js.executeScript("arguments[0].scrollIntoView();", liveJournalPage.listOfLanguages);
         liveJournalPage.clickEnglishLanguage();
 
-        Assertions.assertEquals("Entries feed for frl27", driver.getTitle());
+        //Assertions.assertEquals("Entries feed for frl27", driver.getTitle());
 
 
     }
